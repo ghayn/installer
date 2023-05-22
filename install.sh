@@ -1,13 +1,24 @@
 #!/bin/zsh
 set -e
 
+macOS_version=$(sw_vers -productVersion | awk -F'.' '{print $1}')
+if [ $macOS_version -gt 12 ]; then
+    echo "Your macOS version is greater than 12."
+else
+    echo "Your macOS version is not greater than 12."
+    exit 1
+fi
+
 install_xcode() {
   echo "Checking Command Line Tools for Xcode"
   # Only run if the tools are not installed yet
   # To check that try to print the SDK path
+  set +e
   xcode-select -p &> /dev/null
+  res=$?
+  set -e
 
-  if [ $? -ne 0 ]; then
+  if [ $res -ne 0 ]; then
     echo "Command Line Tools for Xcode not found. Installing from softwareupdate…"
   # This temporary file prompts the 'softwareupdate' utility to list the Command Line Tools
     touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;
