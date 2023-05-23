@@ -34,7 +34,11 @@ install_homebrew() {
   echo "Install Homebrew"
   printf '-%.0s' {1..$(($COLUMNS-1))}; echo
 
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  if command -v brew >/dev/null 2>&1; then
+      echo "Homebrew is installed. Skipping..."
+  else
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  fi
 }
 
 run_setup() {
@@ -45,17 +49,15 @@ run_setup() {
     cleanup
   fi
 
-  exit 1
-
-  git clone https://github.com/ghayn/installer.git /tmp/installer && (cd $tmp_dir)
-  echo "run setup.sh"
-  chmod +x setup.sh && ./setup.sh
+  git clone https://github.com/ghayn/installer.git /tmp/installer
+  cd $tmp_dir
+  echo "run setup.sh at $(pwd)"
+  chmod +x setup.sh && zsh -c "./setup.sh"
 }
 
 cleanup() {
   rm -rf /tmp/installer
 }
-
 
 install_xcode
 install_homebrew
