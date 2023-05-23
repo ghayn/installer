@@ -39,13 +39,14 @@ install_homebrew() {
 
 run_setup() {
   tmp_dir="/tmp/installer"
-  echo "Clone instaler into $tmp_dir"
+  echo "Clone installer into $tmp_dir"
 
   if [ -d "$tmp_dir" ]; then
     cleanup
   fi
 
-exit 1
+  exit 1
+
   git clone https://github.com/ghayn/installer.git /tmp/installer && (cd $tmp_dir)
   echo "run setup.sh"
   chmod +x setup.sh && ./setup.sh
