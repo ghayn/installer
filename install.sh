@@ -29,9 +29,24 @@ install_xcode() {
   fi
 }
 
+install_homebrew() {
+  printf '-%.0s' {1..$(($COLUMNS-1))}; echo
+  echo "Install Homebrew"
+  printf '-%.0s' {1..$(($COLUMNS-1))}; echo
+
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+}
+
 run_setup() {
-  echo "Clone instaler into /tmp/installer"
-  git clone https://github.com/ghayn/installer.git /tmp/installer && cd /tmp/installer
+  tmp_dir="/tmp/installer"
+  echo "Clone instaler into $tmp_dir"
+
+  if [ -d "$tmp_dir" ]; then
+    cleanup
+  fi
+
+exit 1
+  git clone https://github.com/ghayn/installer.git /tmp/installer && (cd $tmp_dir)
   echo "run setup.sh"
   chmod +x setup.sh && ./setup.sh
 }
@@ -42,5 +57,6 @@ cleanup() {
 
 
 install_xcode
+install_homebrew
 run_setup
 cleanup

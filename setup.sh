@@ -79,6 +79,12 @@ __execute_sudo() {
 
 
 start
-install_homebrew
+
+if command -v brew >/dev/null 2>&1; then
+    echo "Homebrew is installed. Skipping..."
+else
+  install_homebrew
+fi
+
 install_packages
 cleanup
