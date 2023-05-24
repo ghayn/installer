@@ -20,7 +20,6 @@ brew "dust"
 brew "the_silver_searcher"
 brew "httpie"
 brew "zoxide"
-brew "1password-cli"
 
 cask "google-chrome"
 cask "1password"

@@ -1,10 +1,5 @@
 #!/bin/zsh
-set -e
-
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "No macOS detected!"
-  exit 1
-fi
+set -eu
 
 start() {
   printf '=%.0s' {1..$(($COLUMNS-1))}; echo
@@ -19,23 +14,15 @@ start() {
   echo "Times up! Here we go!"
 }
 
-install_homebrew() {
-  printf '-%.0s' {1..$(($COLUMNS-1))}; echo
-  echo "Install Homebrew"
-  printf '-%.0s' {1..$(($COLUMNS-1))}; echo
-
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-}
-
 install_packages() {
-  printf '-%.0s' {1..$(($COLUMNS-1))}; echo
   echo "Install Homebrew through brewfile"
-  printf '-%.0s' {1..$(($COLUMNS-1))}; echo
 
   brew bundle
 }
 
 install_zimfw() {
+  echo "Install Homebrew through brewfile"
+
   cd $HOME
   curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 }
@@ -50,41 +37,58 @@ install_gpakosz_tmux() {
 apply_dotfiles() {
   cd $HOME
   chezmoi init --apply https://github.com/ghayn/dotfiles.git
+  zimfw build
 }
 
-function cleanup() {
-    brew cleanup
+install_asdf_runtime() {
+
+  latest_ruby_version=$(asdf latest ruby)
+  latest_python_version=$(asdf latest python)
+  asdf_runtime_plugins=("nodejs" "ruby" "python")
+  asdf_runtime_versions=(
+    "nodejs" "lts"
+    "ruby" "$latest_ruby_version"
+    "python" "$latest_python_version"
+  )
+
+  for plugin in "${asdf_runtime_plugins[@]}"; do
+    asdf plugin add $plugin
+  done
+
+  asdf plugin update --all
+
+  for runtime version in "${asdf_runtime_versions[@]}"; do
+    asdf install $runtime $version
+  done
+
+  asdf global nodejs lts
+  asdf global ruby $latest_ruby_version
+  asdf global python $latest_python_version
 }
 
-__execute() {
-  if ! "$@"
-  then
-    abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
-  fi
+install_extra_packages() {
+  npm install -g npm
+
+  npm install -g pnpm
+
+  gem update --system
+
+  pip install --upgrade pip
+
+  curl -sSL https://install.python-poetry.org | python
+
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 }
 
-__execute_sudo() {
-  local -a args=("$@")
-  if have_sudo_access
-  then
-    if [[ -n "${SUDO_ASKPASS-}" ]]
-    then
-      args=("-A" "${args[@]}")
-    fi
-    execute "/usr/bin/sudo" "${args[@]}"
-  else
-    execute "${args[@]}"
-  fi
+cleanup() {
+  brew cleanup
 }
-
 
 start
-
-if command -v brew >/dev/null 2>&1; then
-    echo "Homebrew is installed. Skipping..."
-else
-  install_homebrew
-fi
-
 install_packages
+install_zimfw
+install_gpakosz_tmux
+apply_dotfiles
+install_asdf_runtime
+install_extra_packages
 cleanup

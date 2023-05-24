@@ -1,5 +1,5 @@
 #!/bin/zsh
-set -e
+set -eu
 
 macOS_version=$(sw_vers -productVersion | awk -F'.' '{print $1}')
 if [ $macOS_version -gt 12 ]; then
@@ -9,7 +9,7 @@ else
     exit 1
 fi
 
-install_xcode() {
+install_xcode_cli_tools() {
   echo "Checking Command Line Tools for Xcode"
   # Only run if the tools are not installed yet
   # To check that try to print the SDK path
@@ -59,7 +59,7 @@ cleanup() {
   rm -rf /tmp/installer
 }
 
-install_xcode
+install_xcode_cli_tools
 install_homebrew
 run_setup
 cleanup
