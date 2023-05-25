@@ -37,6 +37,8 @@ install_gpakosz_tmux() {
 apply_dotfiles() {
   cd $HOME
   chezmoi init --apply https://github.com/ghayn/dotfiles.git
+  source $HOME/.zshenv
+  source $HOME/.zshrc
   zimfw build
 }
 
