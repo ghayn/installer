@@ -1,23 +1,26 @@
 #!/bin/zsh
 set -eu
 
-start() {
-  printf '=%.0s' {1..$(($COLUMNS-1))}; echo
-  echo " !! ATTENTION !! "
-  echo " YOU ARE SETTING UP: Dev Environment (macOS) "
-  printf '=%.0s' {1..$(($COLUMNS-1))}; echo
-  echo ""
-  echo -n " * The setup will begin in 5 seconds..."
+source ./utils.sh
 
-  sleep 5
+password=$PASSWORD
 
-  echo "Times up! Here we go!"
+check_homebrew_is_installed_and_setup_env() {
+  BREW_PATH="/usr/local/bin/brew"
+  [[ $(uname -m) == "arm64" ]] && BREW_PATH="/opt/homebrew/bin/brew"
+
+  if [ ! -f "$BREW_PATH" ]; then
+    echo "Homebrew is not installed. Please install Homebrew first."
+    exit 1
+  fi
+
+  eval "$($BREW_PATH shellenv)"
 }
 
 install_packages() {
-  echo "Install Homebrew through brewfile"
+  echo "Install Homebrew through brewfile (this may take a while)"
 
-  brew bundle
+  autoinput "brew bundle" {\[P\|p\]assword:} $password
 }
 
 install_zimfw() {
@@ -85,7 +88,7 @@ cleanup() {
   brew cleanup
 }
 
-start
+check_homebrew_is_installed_and_setup_env
 install_packages
 install_zimfw
 install_gpakosz_tmux
