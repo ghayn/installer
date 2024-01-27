@@ -66,7 +66,7 @@ install_asdf_runtime() {
 
   for runtime version in "${asdf_runtime_versions[@]}"; do
     asdf install $runtime $version
-    asdf global $runtime $versioin
+    asdf global $runtime $version
   done
 }
 
