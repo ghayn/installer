@@ -44,32 +44,27 @@ apply_dotfiles() {
 
 install_asdf_runtime() {
   asdf_runtime_plugins=("nodejs" "ruby" "python")
-  
+
   for plugin in "${asdf_runtime_plugins[@]}"; do
     asdf plugin add $plugin
   done
 
   latest_ruby_version=$(asdf latest ruby)
   latest_python_version=$(asdf latest python)
-  latest_nodejs_lts_version=$(asdf nodejs resolve lts --latest-available)
+  latest_nodejs_lts_version=$(asdf latest nodejs 20)
 
   asdf_runtime_versions=(
-    "nodejs" "$latest_nodejs_lts_version"
     "ruby" "$latest_ruby_version"
     "python" "$latest_python_version"
+    "nodejs" "$latest_nodejs_lts_version"
   )
-
-
 
   asdf plugin update --all
 
   for runtime version in "${asdf_runtime_versions[@]}"; do
     asdf install $runtime $version
+    asdf global $runtime $versioin
   done
-
-  asdf global nodejs $latest_nodejs_lts_version
-  asdf global ruby $latest_ruby_version
-  asdf global python $latest_python_version
 }
 
 install_extra_packages() {
