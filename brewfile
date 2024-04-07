@@ -1,5 +1,7 @@
 tap "homebrew/cask-fonts"
 tap "buo/cask-upgrade"
+tap localsend/localsend
+
 brew "mas"
 
 brew "chezmoi"
@@ -33,3 +35,4 @@ cask "visual-studio-code"
 cask "karabiner-elements"
 cask "rectangle"
 cask "kitty"
+cask "localsend"
